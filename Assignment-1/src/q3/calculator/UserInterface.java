@@ -218,13 +218,15 @@ public class UserInterface extends JFrame implements KeyListener {
                         ans = Double.toString(Double.parseDouble(operand1) * Double.parseDouble(operand2));
                         break;
                     case "/":
-                        if(operand2.equals('0')) {
+                        if(operand2.equals("0")) {
                             ans = "INVALID";
                             isStopped = true;
                         }
                         else
                             ans = Double.toString(Double.parseDouble(operand1) / Double.parseDouble(operand2));
                         break;
+                    default:
+                        ans = operand1;
                 }
                 operand1 = ans;
                 operator = val;
