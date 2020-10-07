@@ -1,4 +1,4 @@
-package q3.calculator;
+package q3.modifiedCalculator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,8 +16,6 @@ public class UserInterface extends JFrame implements KeyListener {
     static private ArrayList<JButton> funcButtonArrayList;
     static public int NO_OF_BUTTONS_NUM;
     static public int NO_OF_BUTTONS_FUNC;
-    static private boolean highlightNumPad;
-    static private boolean highlightFunctions;
 
     private String operand1, operator, operand2;
     private boolean isStopped;
@@ -31,8 +29,6 @@ public class UserInterface extends JFrame implements KeyListener {
         currentFocusIndexNum = 9;
         currentFocusIndexFunc = 4;
         isStopped = false;
-        highlightNumPad = true;
-        highlightFunctions = false;
     }
 
     public void setupUI () {
@@ -113,20 +109,18 @@ public class UserInterface extends JFrame implements KeyListener {
 
     }
 
-    public static void changeFocus() {
+    public static void changeFocusNum() {
+        int nextFocus = (currentFocusIndexNum + 1) % NO_OF_BUTTONS_NUM;
+        numButtonArrayList.get(nextFocus).setBackground(Color.GREEN);
+        numButtonArrayList.get(currentFocusIndexNum).setBackground(null);
+        currentFocusIndexNum = nextFocus;
+    }
 
-        if(highlightNumPad) {
-            int nextFocus = (currentFocusIndexNum + 1) % NO_OF_BUTTONS_NUM;
-            numButtonArrayList.get(nextFocus).setBackground(Color.GREEN);
-            numButtonArrayList.get(currentFocusIndexNum).setBackground(null);
-            currentFocusIndexNum = nextFocus;
-        }
-        else if(highlightFunctions) {
-            int nextFocus = (currentFocusIndexFunc + 1) % NO_OF_BUTTONS_FUNC;
-            funcButtonArrayList.get(nextFocus).setBackground(Color.GREEN);
-            funcButtonArrayList.get(currentFocusIndexFunc).setBackground(null);
-            currentFocusIndexFunc = nextFocus;
-        }
+    public static void changeFocusFunc() {
+        int nextFocus = (currentFocusIndexFunc + 1) % NO_OF_BUTTONS_FUNC;
+        funcButtonArrayList.get(nextFocus).setBackground(Color.MAGENTA);
+        funcButtonArrayList.get(currentFocusIndexFunc).setBackground(null);
+        currentFocusIndexFunc = nextFocus;
     }
 
     @Override
@@ -136,7 +130,7 @@ public class UserInterface extends JFrame implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent keyEvent) {
-        if(keyEvent.getKeyCode() != KeyEvent.VK_ENTER)
+        if(keyEvent.getKeyCode() != KeyEvent.VK_ENTER && keyEvent.getKeyCode() != KeyEvent.VK_SPACE)
             return;
 
         if(isStopped) {
@@ -147,21 +141,12 @@ public class UserInterface extends JFrame implements KeyListener {
         }
 
         String val = "";
-        if(highlightNumPad) {
+        if(keyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
             val = numButtonArrayList.get(currentFocusIndexNum).getText();
-            numButtonArrayList.get(currentFocusIndexNum).setBackground(null);
-            highlightNumPad = false;
-            highlightFunctions = true;
-            currentFocusIndexNum = 9;
         }
-        else if (highlightFunctions) {
+        else if(keyEvent.getKeyCode() == KeyEvent.VK_SPACE) {
             val = funcButtonArrayList.get(currentFocusIndexFunc).getText();
-            funcButtonArrayList.get(currentFocusIndexFunc).setBackground(null);
-            highlightNumPad = true;
-            highlightFunctions = false;
-            currentFocusIndexFunc = 4;
         }
-
         if(val.charAt(0) >= '0' && val.charAt(0) <= '9') {
             if (!operator.equals(""))
                 operand2 = operand2 + val;
@@ -170,38 +155,52 @@ public class UserInterface extends JFrame implements KeyListener {
             textField.setText(operand1 + operator + operand2);
         }
         else if (val.equals("STOP")) {
+            if (!operand1.equals("") && !operator.equals("") && !operand2.equals("")) {
 
-            String ans = "";
+                String ans = "";
+                switch (operator) {
+                    case "+":
+                        ans = Double.toString(Double.parseDouble(operand1) + Double.parseDouble(operand2));
+                        break;
+                    case "-":
+                        ans = Double.toString(Double.parseDouble(operand1) - Double.parseDouble(operand2));
+                        break;
+                    case "*":
+                        ans = Double.toString(Double.parseDouble(operand1) * Double.parseDouble(operand2));
+                        break;
+                    case "/":
+                        if(operand2.equals("0")) {
+                            ans = "INVALID";
+                            isStopped = true;
+                        }
+                        else
+                            ans = Double.toString(Double.parseDouble(operand1) / Double.parseDouble(operand2));
+                        break;
+                    default:
+                        ans = operand1;
+                }
 
-            switch (operator) {
-                case "+":
-                    ans = Double.toString(Double.parseDouble(operand1) + Double.parseDouble(operand2));
-                    break;
-                case "-":
-                    ans = Double.toString(Double.parseDouble(operand1) - Double.parseDouble(operand2));
-                    break;
-                case "*":
-                    ans = Double.toString(Double.parseDouble(operand1) * Double.parseDouble(operand2));
-                    break;
-                case "/":
-                    if(operand2.equals("0")) {
-                        ans = "INVALID";
-                        isStopped = true;
-                    }
-                    else
-                        ans = Double.toString(Double.parseDouble(operand1) / Double.parseDouble(operand2));
-                    break;
-                default:
-                    ans = operand1;
+                textField.setText("= " + ans);
+                operand1 = ans;
+                operator = operand2 = "";
+                isStopped = true;
             }
-
-            textField.setText("= " + ans);
-            operand1 = ans;
-            operator = operand2 = "";
-            isStopped = true;
+            else if (operand1.isEmpty()){
+                // do nothing
+            }
+            else if (operator.equals("")) {
+                textField.setText("= " + operand1);
+                isStopped = true;
+            }
+            else if (operand2.equals("")) {
+                // do nothing
+            }
         }
         else {
-            if(operator.equals("") || operand2.equals("")) {
+            if(operand1.equals("")) {
+                textField.setText("Enter number");
+            }
+            else if(operator.equals("") || operand2.equals("")) {
                 operator = val;
                 textField.setText(operand1 + operator + operand2);
             }
@@ -234,7 +233,6 @@ public class UserInterface extends JFrame implements KeyListener {
                 textField.setText(operand1 + operator + operand2);
             }
         }
-
     }
 
     @Override
