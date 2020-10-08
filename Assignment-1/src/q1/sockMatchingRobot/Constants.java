@@ -1,5 +1,6 @@
 package q1.sockMatchingRobot;
 
+// Class to store the constant values
 public class Constants {
 
     public static final int NO_SOCKS = -1;

@@ -9,9 +9,14 @@ public class Main {
 
     public static void main(String[] args) throws FileNotFoundException {
 
+        // Array list to store the pile of socks
         ArrayList<Integer> pileOfSocks = new ArrayList<>();
+
+        // Reading the pile of socks from input file
         File file = new File("src/q1/sockMatchingRobot/input.txt");
         Scanner scanner = new Scanner(file);
+
+        // No of arms that will operate synchronously
         int noOfRobots = scanner.nextInt();
 
         while(scanner.hasNextInt()) {
@@ -25,10 +30,14 @@ public class Main {
         System.out.println("No of Robots = "+noOfRobots);
         System.out.println("No of socks in sock pile = " +pileOfSocks.size());
 
+        // Creating new shelf manager and matching machine
         ShelfManager shelfManager = new ShelfManager();
         MatchingMachine matchingMachine = new MatchingMachine(shelfManager);
+
+        // Instance through which data will be shared among different threads
         SharedData sharedData = new SharedData(noOfRobots, pileOfSocks, matchingMachine, shelfManager);
 
+        // Generating threads for each robotic arm
         ArrayList<Thread> threads = new ArrayList<>();
         for (int i = 0; i < noOfRobots; i++) {
             RoboticArm roboticArm = new RoboticArm(sharedData, "Robotic Arm-"+(i+1));
@@ -36,6 +45,7 @@ public class Main {
             threads.add(thread);
         }
 
+        // Starting all the threads
         for (int i = 0; i < noOfRobots; i++) {
             threads.get(i).start();
         }

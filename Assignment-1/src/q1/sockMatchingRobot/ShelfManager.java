@@ -1,11 +1,13 @@
 package q1.sockMatchingRobot;
 
+// Class for shelf manager
 public class ShelfManager {
 
     ShelfManager() {
 
     }
 
+    // Function to put sock pairs on respective shelves
     void handleSockPair(int color){
         switch (color) {
             case Constants.WHITE_SOCKS:
