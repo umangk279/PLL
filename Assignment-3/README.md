@@ -30,7 +30,7 @@ Both fixture x and nextMatch require that the fixtures are first generated using
 
 ## Problem 3
 
-The design can be generated using: design <area> <number of bedrooms> <number of halls>. \
+The design can be generated using: design area number of bedrooms number of halls. \
 If not design is possible with the given input values and the constraints in the problem "Design not possible is printed". \
 The output takes around 12-14 seconds on average to display the output. \
 
